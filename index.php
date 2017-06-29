@@ -42,7 +42,6 @@ $app->get('/productos', function() use($db, $app){
 $app->get('/productos/:id', function($id) use($db, $app){
 
     $sql = 'SELECT * FROM productos WHERE id = '.$id;
-    print $sql;
     $query = $db->query($sql);
 
     $result = array(
@@ -67,12 +66,72 @@ $app->get('/productos/:id', function($id) use($db, $app){
 
 // ELIMINAR UN PRODUCTO
 
+$app->get('/eliminar-productos/:id', function($id) use($db, $app){
 
+    $sql = 'DELETE FROM productos WHERE id = '.$id;
+
+    $query = $db->query($sql);
+
+    if($query){         
+        $result = array(
+            'status' => 'success',
+            'code' => 200,
+            'message' => 'El producto se ah eliminado correctamente !!'
+        );
+    }else{
+         $result = array(
+        'status' => 'error',
+        'code' => 404,
+        'message' => 'El producto NO se ah eliminado correctamente !!'
+          );
+    }
+
+    echo json_encode($result);
+});
 // ACTUALIZAR UN PRODUCTO 
+$app->post('/actualizar-productos/:id', function($id) use($db, $app){
+    $json = $app->request->post('json');
+    $data = json_decode($json,true);
 
+    $sql = " UPDATE productos ".
+           " SET nombre = '{$data["nombre"]}', ".
+           "     description = '{$data["description"]}', ".
+		   "     precio = '{$data["precio"]}' ".
+           " WHERE id = {$id}";		
+
+    $query = $db->query($sql);
+
+    if($query){         
+        $result = array(
+            'status' => 'success',
+            'code' => 200,
+            'message' => 'El producto se ah actualizado correctamente !!'
+        );
+    }else{
+         $result = array(
+        'status' => 'error',
+        'code' => 404,
+        'message' => 'El producto NO se ah actualizado correctamente !!'
+          );
+    }
+
+    echo json_encode($result);
+});
 
 // SUBIR UNA IMAGEN A UN PRODUCTO 
+$app->post('/subir-archivo', function() use($db,$app){
+    $result = array(
+        'status' => 'error',
+        'code' => 404,
+        'message' => 'el archivo no se ah podido subir !!'
+    );
 
+    if(isset($_FILES['subir'])){
+        echo "el archivo se ah subido correctamente";
+    }else{
+        
+    }
+});
 
 // GUARDAR PRODUCTOS
 $app->post('/productos', function() use($app, $db){
@@ -126,9 +185,6 @@ $app->post('/productos', function() use($app, $db){
         echo json_encode($result);
 
     });
-
-
-
 //este objeto corre todas las rutas anteriores
 $app->run();
 ?>
